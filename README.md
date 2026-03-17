@@ -1,6 +1,6 @@
-# first-chat-app
+# nsingh-slash-app
 this is my first rocket chat app
-
+this application has an express [server](https://github.com/0Nsingh/nsinghslashapp-rest-server) 
 ## Getting Started
 Now that you have generated a blank default Rocket.Chat App, what are you supposed to do next?
 Start developing! Open up your favorite editor, our recommended one is Visual Studio code,
