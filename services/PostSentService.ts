@@ -13,11 +13,11 @@ public static async checkMessageEligibility(persis:IPersistenceRead,logger:ILogg
     const status= await PersistenceHelper.findAll(persis,'status','ephemereal');
     logger.debug(status);
     const [{data}]= status as any;
-    const AUTHORIZED_USER='nimrit.singh'
-    if (data.enabled && sender.username!==AUTHORIZED_USER){
+    // const AUTHORIZED_USER='nimrit.singh'
+    if (data.enabled ){
         return true;
     }
-    else if (data.enabled && sender.username!==AUTHORIZED_USER && url){
+    else if (data.enabled && url){
         return true;
 
     }
@@ -26,17 +26,15 @@ public static async checkMessageEligibility(persis:IPersistenceRead,logger:ILogg
     }
 
 }
-private static async sendRequest(url:string,message:IMessage,sender:string,http:IHttp):Promise<string>{
+private static async sendRequest(url:string,message:string,sender:string,http:IHttp):Promise<string>{
     const response=await http.post(url,
         {data:{
         'userid':sender,
         'message':message
     }});
     const data=response.data
-    if (!data.result){
-        return data.error
-    }
-    return data.result
+    
+    return `${data.result} (${data.id})`
 }
 public static async executeNotification(
     persis: IPersistence,
@@ -50,12 +48,13 @@ public static async executeNotification(
    
     let notificationText = `Thank you for mentioning me @${message.sender.username}`;
     if (url && url.trim() !== "") {
+        const text = typeof message.text === 'string' ? message.text : ""
         try {
-            const result = await this.sendRequest(url, message, message.sender.id,http);
+            const result = await this.sendRequest(url,text, message.sender.id,http);
             
             // If the external server provides a specific message, use it
             if (result) {
-                notificationText = typeof result === 'string' ? result : result;
+                notificationText = typeof result === 'string' ? result : `Thank you for mentioning me @${message.sender.username}`;
             }
         } catch (error) {
             logger.error(`Failed to send external request: ${error.message}`);
